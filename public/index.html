@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка файлов</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="media/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="media/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <h1>Загрузка файлов</h1>
+        <button id="emptyTrashButton">Очистить корзину</button>
+        <button id="checkFilesButton">Проверить файлы</button>
+        <button id="filterButton">Фильтровать</button>
+        <label class="switch">
+            <input type="checkbox" id="viewToggle">
+            <span class="slider round"></span>
+        </label>
+    </header>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="username" name="username" placeholder="Введите имя пользователя">
+        <br>
+        <label for="fileInput">Выберите файл:</label>
+        <input type="file" id="fileInput" name="file" required>
+        <br>
+        <button type="submit">Загрузить</button>
+    </form>
+    <div id="fileCount">Количество файлов: 0</div>
+    <div id="fileList" class="list-view"></div>
+
+    <!-- Модальное окно для фильтрации -->
+    <div id="filterModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFilterModal()">&times;</span>
+            <h2>Фильтры</h2>
+            <label for="filenameInput">Имя файла:</label>
+            <input type="text" id="filenameInput" placeholder="Введите имя файла">
+            <label for="authorInput">Автор:</label>
+            <input type="text" id="authorInput" placeholder="Введите имя автора">
+            <label for="searchType">Тип поиска:</label>
+            <select id="searchType" class="custom-select">
+                <option value="exact">Строго по строке</option>
+                <option value="substring">Мягко по подстроке</option>
+            </select>
+            <label for="filterParamSelect">Сортировать по:</label>
+            <select id="filterParamSelect" class="custom-select">
+                <option value="id">ID</option>
+                <option value="size">Размер</option>
+            </select>
+            <label for="orderSelect">Порядок сортировки:</label>
+            <select id="orderSelect" class="custom-select">
+                <option value="asc">По возрастанию</option>
+                <option value="desc">По убыванию</option>
+            </select>
+            <div id = "divFilterButtons">
+                <button id="applyFilterButton">Применить</button>
+                <button id="resetFilterButton">Сбросить фильтры</button>
+            </div>            
+        </div>
+    </div>
+
+    <!-- Модальное окно для подтверждения опорожнения корзины -->
+    <div id="emptyTrashModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEmptyTrashModal()">&times;</span>
+            <p>Очистить корзину?</p>
+            <button id="confirmEmptyTrash">ДА</button>
+            <button id="cancelEmptyTrash">НЕТ</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно для замены файла -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReplaceModal()">&times;</span>
+            <p id="modal-text"></p>
+            <button id="confirm-replace">ДА</button>
+            <button id="cancel-replace">НЕТ</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно для метаданных -->
+    <div id="metadataModal" class="modal">
+        <div class="modal-content left-align">
+            <span class="close" onclick="closeMetadataModal()">&times;</span>
+            <h2>Метаданные документа</h2>
+            <pre id="metadataContent"></pre>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

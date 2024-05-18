@@ -1,0 +1,317 @@
+@font-face {
+    font-family: 'Code New Roman';
+    src: url('../fonts/Code New Roman.otf') format('truetype'); /* Укажите правильный путь к файлу шрифта */
+}
+
+body {
+    font-family: 'Code New Roman', sans-serif;
+    margin: 40px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+.file-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    
+    align-items: center;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.file-name {
+    word-break: break-all; /* Перенос длинных имен файлов */
+}
+
+.file-actions {
+    flex: 0 0 70%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.download-button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    color: #fff;
+    background-color: #002aff;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.download-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.download-button:active {
+    background-color: #004494;
+    transform: translateY(0);
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input[type="text"],
+input[type="file"] {
+    display: block;
+    margin-top: 5px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.replace-button {
+    background-color: #ffc107;
+}
+
+.replace-button:hover {
+    background-color: #e0a800;
+}
+
+.delete-button {
+    background-color: #dc3545;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+#emptyTrashButton {
+    background-color: #ff5722;
+}
+
+#emptyTrashButton:hover {
+    background-color: #e64a19;
+}
+
+#resetFilterButton {
+    background-color: #dc3545;
+}
+
+#resetFilterButton:hover {
+    background-color: #c82333;
+}
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.modal-content.left-align {
+    text-align: left; /* Выравнивание по левому краю */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Стили для сетки */
+.grid-view {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.grid-view .file-card {
+    width: calc(33.333% - 10px); /* Три карточки в строке с промежутками */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.grid-view .file-name {
+    margin-bottom: 10px;
+}
+
+.grid-view .file-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Два столбца одинаковой ширины */
+    gap: 5px; /* Промежуток между элементами */
+}
+
+
+/* Стили для флажка */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #007bff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Стили для кастомных select */
+.custom-select {
+    position: relative;
+    display: inline-block;
+    width: 70%;
+    margin-top: 10px;
+}
+
+.custom-select select {
+    display: none; /* Скрываем стандартный select */
+}
+
+.select-selected {
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.select-selected:after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    border: solid #888;
+    border-width: 0 3px 3px 0;
+    padding: 3px;
+    transform: rotate(45deg);
+    transition: .4s;
+}
+
+.select-selected.select-arrow-active:after {
+    transform: rotate(-135deg);
+}
+
+.select-items {
+    position: absolute;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 99;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+.select-items div {
+    padding: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.select-items div:hover {
+    background-color: #ddd;
+}
+
+.select-hide {
+    display: none;
+}
