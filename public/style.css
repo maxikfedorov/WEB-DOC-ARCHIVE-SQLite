@@ -59,22 +59,38 @@ form {
     margin-top: 10px;
     padding: 10px 20px;
     color: #fff;
-    background-color: #002aff;
+    background-color: #006636;
     border: none;
     border-radius: 4px;
     text-decoration: none;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
 }
 
 .download-button:hover {
-    background-color: #0056b3;
+    background-color: #00b351;
     transform: translateY(-2px);
 }
 
 .download-button:active {
-    background-color: #004494;
+    background-color: #009459;
     transform: translateY(0);
 }
+
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.drop-zone.dragover {
+    border-color: #007bff;
+    background-color: #f1f1f1;
+}
+
 
 label {
     display: block;

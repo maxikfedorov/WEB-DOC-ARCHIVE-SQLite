@@ -47,13 +47,22 @@ function displayFile(id, filename, size) {
         <p class="file-name">${filename}</p>
         <p class="file-size">${size.toFixed(2)} KB</p>
         <div class="file-actions">
-            <a href="/download/${id}" class="download-button">Скачать</a>
+            <button class="download-button" onclick="downloadFile(${id})">Скачать</button>
             <button class="replace-button" onclick="openReplaceModal('${id}', '${filename}')">Заменить</button>
             <button class="delete-button" onclick="deleteFile('${id}', '${filename}')">Удалить</button>
             <button class="metadata-button" onclick="showMetadata('${id}')">Метаданные</button>
         </div>
     `;
     fileList.appendChild(fileCard);
+}
+
+function downloadFile(id) {
+    const link = document.createElement('a');
+    link.href = `/download/${id}`;
+    link.download = '';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function updateFileCount(count) {
@@ -149,8 +158,8 @@ document.getElementById('confirm-replace').addEventListener('click', async funct
             for (let i = 0; i < fileCards.length; i++) {
                 if (fileCards[i].querySelector('p').textContent === result.oldFilename) {
                     fileCards[i].querySelector('p').textContent = result.filename;
-                    fileCards[i].querySelector('a').href = `/storage/${result.filename}`;
-                    fileCards[i].querySelector('a').textContent = 'Скачать';
+                    fileCards[i].querySelector('.download-button').href = `/storage/${result.filename}`;
+                    fileCards[i].querySelector('.download-button').textContent = 'Скачать';
                     fileCards[i].querySelector('.replace-button').setAttribute('onclick', `openReplaceModal('${result.id}', '${result.filename}')`);
                     fileCards[i].querySelector('.delete-button').setAttribute('onclick', `deleteFile('${result.id}', '${result.filename}')`);
                     fileCards[i].querySelector('.metadata-button').setAttribute('onclick', `showMetadata('${result.id}')`);
