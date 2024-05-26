@@ -356,12 +356,24 @@ document.getElementById('viewHistoryButton').addEventListener('click', function(
     loadHistory();
 });
 
-async function loadHistory() {
-    const response = await fetch('/history');
+document.getElementById('historyFilterSelect').addEventListener('change', function() {
+    const filter = this.value;
+    loadHistory(filter);
+});
+
+async function loadHistory(filter = 'last10') {
+    const response = await fetch(`/history?filter=${filter}`);
     if (response.ok) {
         const history = await response.json();
         const historyContent = document.getElementById('historyContent');
         historyContent.innerHTML = ''; // Очистка содержимого перед загрузкой
+
+        // Применение класса для сетки в зависимости от фильтра
+        if (['today', 'yesterday', 'last7Days', 'allTime'].includes(filter)) {
+            historyContent.classList.add('history-grid-view');
+        } else {
+            historyContent.classList.remove('history-grid-view');
+        }
 
         history.forEach(entry => {
             const entryElement = document.createElement('div');
@@ -381,9 +393,24 @@ async function loadHistory() {
     }
 }
 
+document.getElementById('clearHistoryButton').addEventListener('click', async function() {
+    const response = await fetch('/clear-history', {
+        method: 'POST'
+    });
+
+    if (response.ok) {
+        alert('История очищена');
+        loadHistory(); // Перезагрузка истории после очистки
+    } else {
+        alert('Ошибка при очистке истории');
+    }
+});
+
 function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
+
+
 
 
 

@@ -34,10 +34,6 @@ db.exec(`
         data BLOB,
         FOREIGN KEY (fileId) REFERENCES files(id)
     );
-`);
-
-// Создание таблицы для истории изменений
-db.exec(`
     CREATE TABLE IF NOT EXISTS history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         fileId INTEGER,
@@ -49,14 +45,45 @@ db.exec(`
     );
 `);
 
-// Маршрут для получения последних 10 записей истории изменений
+// Маршрут для получения истории изменений с фильтрацией по времени
 app.get('/history', (req, res) => {
-    const stmt = db.prepare(`
-        SELECT * FROM history ORDER BY changeDate DESC LIMIT 10
-    `);
-    const history = stmt.all();
+    const filter = req.query.filter || 'last10';
+    let query = `SELECT * FROM history ORDER BY changeDate DESC`;
+    let params = [];
+
+    switch (filter) {
+        case 'lastHour':
+            query = `SELECT * FROM history WHERE changeDate >= datetime('now', '-1 hour') ORDER BY changeDate DESC`;
+            break;
+        case 'today':
+            query = `SELECT * FROM history WHERE date(changeDate) = date('now') ORDER BY changeDate DESC`;
+            break;
+        case 'yesterday':
+            query = `SELECT * FROM history WHERE date(changeDate) = date('now', '-1 day') ORDER BY changeDate DESC`;
+            break;
+        case 'last7Days':
+            query = `SELECT * FROM history WHERE changeDate >= datetime('now', '-7 days') ORDER BY changeDate DESC`;
+            break;
+        case 'allTime':
+            query = `SELECT * FROM history ORDER BY changeDate DESC`;
+            break;
+        default:
+            query = `SELECT * FROM history ORDER BY changeDate DESC LIMIT 10`;
+            break;
+    }
+
+    const stmt = db.prepare(query);
+    const history = stmt.all(...params);
     res.json(history);
 });
+
+// Маршрут для очистки истории изменений
+app.post('/clear-history', (req, res) => {
+    const deleteStmt = db.prepare(`DELETE FROM history`);
+    deleteStmt.run();
+    res.sendStatus(200);
+});
+
 
 
 // Настройка хранилища для multer

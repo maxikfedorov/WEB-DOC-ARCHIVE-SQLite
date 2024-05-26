@@ -351,3 +351,29 @@ input:checked + .slider:before {
 .history-text {
     margin-top: 5px;
 }
+
+#historyFilter {
+    margin-bottom: 20px;
+}
+
+#historyFilterSelect {
+    padding: 10px;
+    border: 1px solid #000;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.history-grid-view {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.history-grid-view .history-entry {
+    width: calc(25% - 10px); /* Четыре карточки в строке с промежутками */
+    border: 1px solid #000;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+}
+

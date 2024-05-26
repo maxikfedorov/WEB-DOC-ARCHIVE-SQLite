@@ -84,12 +84,29 @@
         </div>
     </div>
 
+    
     <!-- Модальное окно для истории изменений -->
     <div id="historyModal" class="modal">
-        <div class="modal-content left-align">
+        
+        <div class="modal-content left-align">            
             <span class="close" onclick="closeHistoryModal()">&times;</span>
-            <h2>История изменений</h2>
+            <h2>История изменений
+                <button id="clearHistoryButton">Очистить историю</button> <!-- Перемещенная кнопка -->
+
+            </h2> 
+            
+            <div id="historyFilter">
+                <select id="historyFilterSelect">
+                    <option value="last10">Последние 10 записей</option>
+                    <option value="lastHour">Последний час</option>
+                    <option value="today">Сегодня</option>
+                    <option value="yesterday">Вчера</option>
+                    <option value="last7Days">Последние 7 дней</option>
+                    <option value="allTime">Всё время</option>
+                </select>
+            </div>
             <div id="historyContent"></div>
+            
         </div>
     </div>
 
