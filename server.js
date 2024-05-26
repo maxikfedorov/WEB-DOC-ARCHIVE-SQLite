@@ -12,6 +12,12 @@ const db = new Database(path.join(__dirname, 'db', 'archive.db'));
 // Настройка CORS
 app.use(cors());
 
+// Для обработки JSON данных
+app.use(express.json());
+
+// Использование статических файлов
+app.use(express.static('public'));
+
 // Создание таблиц в базе данных, если они не существуют
 db.exec(`
     CREATE TABLE IF NOT EXISTS files (
@@ -23,6 +29,7 @@ db.exec(`
         extension TEXT,
         size REAL,
         state TEXT,
+        status TEXT DEFAULT 'В работе',
         relatedFiles TEXT,
         data BLOB
     );
@@ -41,6 +48,14 @@ db.exec(`
         author TEXT,
         changeDate DATETIME,
         changeText TEXT,
+        FOREIGN KEY (fileId) REFERENCES files(id)
+    );
+    CREATE TABLE IF NOT EXISTS comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fileId INTEGER,
+        author TEXT,
+        comment TEXT,
+        commentDate DATETIME,
         FOREIGN KEY (fileId) REFERENCES files(id)
     );
 `);
@@ -84,8 +99,6 @@ app.post('/clear-history', (req, res) => {
     res.sendStatus(200);
 });
 
-
-
 // Настройка хранилища для multer
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -98,13 +111,6 @@ const upload = multer({
     }
 });
 
-app.use(express.static('public'));
-
-// Функция для очистки имени файла
-const sanitizeFilename = (filename) => {
-    return filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
-};
-
 // Маршрут для получения списка файлов
 app.get('/files', (req, res) => {
     const order = req.query.order === 'desc' ? 'DESC' : 'ASC';
@@ -116,7 +122,7 @@ app.get('/files', (req, res) => {
     const filenameQuery = searchType === 'LIKE' ? `%${filename}%` : filename;
 
     let query = `
-        SELECT id, filename, size FROM files 
+        SELECT id, filename, size, status FROM files 
         WHERE state = 'Current'
     `;
     const params = [];
@@ -137,6 +143,7 @@ app.get('/files', (req, res) => {
     const files = stmt.all(...params);
     res.json(files);
 });
+
 // Маршрут для загрузки файлов
 app.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
@@ -260,8 +267,6 @@ app.post('/replace', upload.single('file'), (req, res) => {
     res.json({ id: newId, filename: req.file.originalname, oldFilename: oldFileMeta.filename });
 });
 
-
-
 // Маршрут для скачивания файла
 app.get('/download/:id', (req, res) => {
     const id = parseInt(req.params.id);
@@ -279,24 +284,60 @@ app.get('/download/:id', (req, res) => {
     res.send(file.data);
 });
 
-// Маршрут для проверки и реанимации файлов
-app.post('/check-files', (req, res) => {
+// Маршрут для получения метаданных конкретного файла
+app.get('/metadata/:id', (req, res) => {
+    const id = parseInt(req.params.id);
     const stmt = db.prepare(`
-        SELECT * FROM files WHERE state = 'Current'
+        SELECT * FROM files WHERE id = ?
     `);
-    const metaData = stmt.all();
+    const fileMetadata = stmt.get(id);
+
+    if (!fileMetadata) {
+        return res.status(404).send('Файл не найден');
+    }
+
+    res.json(fileMetadata);
+});
+
+// Маршрут для обновления статуса конкретного файла
+app.post('/update-status/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const newStatus = req.body.status;
 
     const updateStmt = db.prepare(`
-        UPDATE files SET state = 'Deleted', modifyDate = ? WHERE id = ?
+        UPDATE files SET status = ?, modifyDate = datetime('now') WHERE id = ?
     `);
+    updateStmt.run(newStatus, id);
 
-    metaData.forEach(file => {
-        if (!file) {
-            updateStmt.run(new Date().toISOString(), file.id);
-        }
-    });
+    // Запись в историю
+    const historyStmt = db.prepare(`
+        INSERT INTO history (fileId, filename, author, changeDate, changeText)
+        VALUES (?, (SELECT filename FROM files WHERE id = ?), 'system', datetime('now'), ?)
+    `);
+    historyStmt.run(id, id, `Статус изменён на ${newStatus}`);
 
     res.sendStatus(200);
+});
+
+// Маршрут для добавления комментария
+app.post('/add-comment', (req, res) => {
+    const { fileId, author, comment } = req.body;
+    const stmt = db.prepare(`
+        INSERT INTO comments (fileId, author, comment, commentDate)
+        VALUES (?, ?, ?, datetime('now'))
+    `);
+    stmt.run(fileId, author, comment);
+    res.sendStatus(200);
+});
+
+// Маршрут для получения комментариев к файлу
+app.get('/comments/:fileId', (req, res) => {
+    const fileId = parseInt(req.params.fileId);
+    const stmt = db.prepare(`
+        SELECT * FROM comments WHERE fileId = ? ORDER BY commentDate DESC
+    `);
+    const comments = stmt.all(fileId);
+    res.json(comments);
 });
 
 //Очистка корзины
@@ -313,22 +354,6 @@ app.post('/empty-trash', (req, res) => {
 
     res.sendStatus(200);
 });
-
-// Маршрут для получения метаданных конкретного файла
-app.get('/metadata/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const stmt = db.prepare(`
-        SELECT * FROM files WHERE id = ?
-    `);
-    const fileMetadata = stmt.get(id);
-
-    if (!fileMetadata) {
-        return res.status(404).send('Файл не найден');
-    }
-
-    res.json(fileMetadata);
-});
-
 
 // Запуск сервера
 app.listen(PORT, () => {

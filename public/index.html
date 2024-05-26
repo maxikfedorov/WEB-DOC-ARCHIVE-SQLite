@@ -31,6 +31,7 @@
     </form>
     
     <div id="fileCount">Количество файлов: 0</div>
+
     <div id="fileList" class="list-view"></div> <!-- Добавлен класс list-view -->
 
     <!-- Модальное окно для фильтрации -->
@@ -74,6 +75,22 @@
         </div>
     </div>
 
+    <!-- Модальное окно для комментариев -->
+    <div id="commentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCommentModal()">&times;</span>
+            <h2>Комментарии</h2>
+            <form id="commentForm">
+                <label for="commentAuthor">Имя пользователя:</label>
+                <input type="text" id="commentAuthor" name="author" required>
+                <label for="commentText">Комментарий:</label>
+                <textarea id="commentText" name="comment" required></textarea>
+                <button type="submit">Отправить</button>
+            </form>
+            <div id="commentsList"></div>
+        </div>
+    </div>
+
     <!-- Модальное окно для замены файла -->
     <div id="modal" class="modal">
         <div class="modal-content">
@@ -83,7 +100,6 @@
             <button id="cancel-replace">НЕТ</button>
         </div>
     </div>
-
     
     <!-- Модальное окно для истории изменений -->
     <div id="historyModal" class="modal">

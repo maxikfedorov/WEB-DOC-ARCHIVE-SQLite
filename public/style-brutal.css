@@ -1,8 +1,10 @@
+/* Подключение шрифта */
 @font-face {
     font-family: 'Code New Roman';
     src: url('../fonts/Code New Roman.otf') format('truetype');
 }
 
+/* Основные стили для body */
 body {
     font-family: 'Courier New', monospace;
     margin: 40px;
@@ -10,6 +12,7 @@ body {
     color: #000;
 }
 
+/* Стили для header */
 header {
     display: flex;
     justify-content: space-between;
@@ -19,15 +22,18 @@ header {
     padding-bottom: 10px;
 }
 
+/* Стили для заголовков */
 h1 {
     color: #000;
     font-size: 24px;
 }
 
+/* Стили для форм */
 form {
     margin-bottom: 20px;
 }
 
+/* Стили для карточек файлов */
 .file-card {
     border: 1px solid #000;
     padding: 10px;
@@ -59,6 +65,7 @@ form {
     align-items: center;
 }
 
+/* Стили для кнопок загрузки */
 .download-button {
     display: inline-block;
     margin-top: 10px;
@@ -74,6 +81,7 @@ form {
     background-color: #333;
 }
 
+/* Стили для зоны перетаскивания файлов */
 .drop-zone {
     border: 2px dashed #000;
     padding: 20px;
@@ -88,7 +96,7 @@ form {
     border-color: #000;
 }
 
-
+/* Стили для меток и полей ввода */
 label {
     display: block;
     margin-top: 10px;
@@ -104,6 +112,7 @@ input[type="file"] {
     box-sizing: border-box;
 }
 
+/* Стили для кнопок */
 button {
     margin-top: 10px;
     padding: 10px 20px;
@@ -134,11 +143,11 @@ button:hover {
 }
 
 #emptyTrashButton {
-    background-color: #ff5722;
+    background-color: #ff0000;
 }
 
 #emptyTrashButton:hover {
-    background-color: #e64a19;
+    background-color: #cc0000;
 }
 
 #resetFilterButton {
@@ -149,6 +158,7 @@ button:hover {
     background-color: #cc0000;
 }
 
+/* Стили для модальных окон */
 .modal {
     display: none;
     position: fixed;
@@ -189,14 +199,15 @@ button:hover {
     cursor: pointer;
 }
 
+/* Стили для сеточного вида */
 .grid-view {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 20px; /* Увеличено расстояние между карточками */
 }
 
 .grid-view .file-card {
-    width: calc(33.333% - 10px);
+    width: calc(33.333% - 20px); /* Учитываем новое значение gap */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -213,6 +224,32 @@ button:hover {
     gap: 5px;
 }
 
+/* Адаптивные стили для количества карточек в строке */
+@media (min-width: 1200px) {
+    .grid-view .file-card {
+        width: calc(25% - 20px); /* Четыре карточки в строке */
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .grid-view .file-card {
+        width: calc(33.333% - 20px); /* Три карточки в строке */
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .grid-view .file-card {
+        width: calc(50% - 20px); /* Две карточки в строке */
+    }
+}
+
+@media (max-width: 767px) {
+    .grid-view .file-card {
+        width: calc(100% - 20px); /* Одна карточка в строке */
+    }
+}
+
+/* Стили для переключателей */
 .switch {
     position: relative;
     display: inline-block;
@@ -256,6 +293,14 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
+/* Стили для кнопки переключения вида */
+#viewToggle:disabled + .slider {
+    opacity: 0.5; /* Понижение прозрачности */
+    cursor: not-allowed; /* Изменение курсора */
+}
+
+
+/* Стили для кастомного селекта */
 .custom-select {
     position: relative;
     display: inline-block;
@@ -313,7 +358,7 @@ input:checked + .slider:before {
     display: none;
 }
 
-
+/* Стили для баннера успеха */
 #successBanner {
     display: none;
     position: fixed;
@@ -330,6 +375,7 @@ input:checked + .slider:before {
     transition: opacity 1s ease-in-out;
 }
 
+/* Стили для истории */
 .history-entry {
     border-bottom: 1px solid #ccc;
     padding: 10px 0;
@@ -370,10 +416,99 @@ input:checked + .slider:before {
 }
 
 .history-grid-view .history-entry {
-    width: calc(25% - 10px); /* Четыре карточки в строке с промежутками */
+    width: calc(25% - 10px);
     border: 1px solid #000;
     padding: 10px;
     box-sizing: border-box;
     background-color: #f5f5f5;
 }
 
+/* Стили для выпадающего меню статуса */
+.status-select {
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.status-select:hover {
+    background-color: #f5f5f5;
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.status-select option {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Стили для кнопки комментариев */
+.comment-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.comment-button:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для модального окна комментариев */
+#commentModal .modal-content {
+    text-align: left;
+    max-width: 500px; /* Ограничение максимальной ширины модального окна */
+    margin: auto; /* Центрирование модального окна */
+}
+
+#commentModal label {
+    display: block;
+    margin-top: 10px;
+}
+
+#commentModal input[type="text"],
+#commentModal textarea {
+    display: block;
+    margin-top: 5px;
+    padding: 8px;
+    border: 1px solid #000;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%; /* Ограничение максимальной ширины текстового поля */
+    max-height: 200px; /* Ограничение максимальной высоты текстового поля */
+    resize: vertical; /* Разрешить изменение размера только по вертикали */
+}
+
+#commentModal button[type="submit"] {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#commentModal button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для комментариев */
+.comment {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.comment:last-child {
+    border-bottom: none;
+}

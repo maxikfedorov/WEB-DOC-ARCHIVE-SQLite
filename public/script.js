@@ -1,3 +1,4 @@
+// Инициализация событий и элементов после загрузки DOM
 document.addEventListener('DOMContentLoaded', function() {
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.createElement('input');
@@ -71,20 +72,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Обновление статуса файла
+async function updateStatus(id, newStatus) {
+    const response = await fetch(`/update-status/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+    });
+
+    if (response.ok) {
+        const selectElement = document.querySelector(`.file-card select[onchange="updateStatus(${id}, this.value)"]`);
+        selectElement.className = `status-select ${getStatusClass(newStatus)}`;
+    } else {
+        alert('Ошибка при обновлении статуса');
+    }
+}
+
+// Загрузка файлов с фильтрацией и сортировкой
 async function loadFiles(order = 'asc', filterParam = 'id', author = '', filename = '', searchType = 'substring') {
     const response = await fetch(`/files?order=${order}&filterParam=${filterParam}&author=${encodeURIComponent(author)}&filename=${encodeURIComponent(filename)}&searchType=${searchType}`);
     if (response.ok) {
         const files = await response.json();
         const fileList = document.getElementById('fileList');
         fileList.innerHTML = ''; // Очистка списка файлов перед загрузкой
-        files.forEach(file => displayFile(file.id, file.filename, file.size));
+        files.forEach(file => displayFile(file.id, file.filename, file.size, file.status));
         updateFileCount(files.length);
     } else {
         alert('Ошибка при загрузке списка файлов');
     }
 }
 
-function displayFile(id, filename, size) {
+// Отображение файла в списке
+function displayFile(id, filename, size, status) {
     const fileList = document.getElementById('fileList');
     const fileCard = document.createElement('div');
     fileCard.className = 'file-card';
@@ -96,11 +117,32 @@ function displayFile(id, filename, size) {
             <button class="replace-button" onclick="openReplaceModal('${id}', '${filename}')">Заменить</button>
             <button class="delete-button" onclick="deleteFile('${id}', '${filename}')">Удалить</button>
             <button class="metadata-button" onclick="showMetadata('${id}')">Метаданные</button>
+            <button class="comment-button" onclick="openCommentModal(${id})">Комментарии</button>
+            <select class="status-select ${getStatusClass(status)}" onchange="updateStatus(${id}, this.value)">
+                <option value="В работе" ${status === 'В работе' ? 'selected' : ''}>В работе</option>
+                <option value="Отклонён" ${status === 'Отклонён' ? 'selected' : ''}>Отклонён</option>
+                <option value="Принят" ${status === 'Принят' ? 'selected' : ''}>Принят</option>
+            </select>
         </div>
     `;
     fileList.appendChild(fileCard);
 }
 
+// Получение CSS-класса для статуса файла
+function getStatusClass(status) {
+    switch (status) {
+        case 'В работе':
+            return 'status-in-progress';
+        case 'Отклонён':
+            return 'status-rejected';
+        case 'Принят':
+            return 'status-accepted';
+        default:
+            return '';
+    }
+}
+
+// Скачивание файла
 function downloadFile(id) {
     const link = document.createElement('a');
     link.href = `/download/${id}`;
@@ -110,6 +152,7 @@ function downloadFile(id) {
     document.body.removeChild(link);
 }
 
+// Обновление счётчика файлов
 function updateFileCount(count) {
     const fileCountElement = document.getElementById('fileCount');
     fileCountElement.textContent = `Количество файлов: ${count}`;
@@ -143,7 +186,7 @@ function updateFileCount(count) {
 //     }
 // });
 
-document.getElementById('filterButton').addEventListener('click', function() {
+document.getElementById('filterButton').addEventListener('click', function() { 
     document.getElementById('filterModal').style.display = 'block';
 });
 
@@ -156,6 +199,7 @@ document.getElementById('resetFilterButton').addEventListener('click', function(
     applyFilters();
 });
 
+// Применение фильтров для загрузки файлов
 function applyFilters() {
     const filterParam = document.getElementById('filterParamSelect').value;
     const order = document.getElementById('orderSelect').value;
@@ -165,6 +209,7 @@ function applyFilters() {
     loadFiles(order, filterParam, author, filename, searchType);
 }
 
+// Сброс фильтров к значениям по умолчанию
 function resetFilters() {
     document.getElementById('filenameInput').value = '';
     document.getElementById('authorInput').value = '';
@@ -173,10 +218,12 @@ function resetFilters() {
     document.getElementById('orderSelect').value = 'asc';
 }
 
+// Закрытие модального окна фильтрации
 function closeFilterModal() {
     document.getElementById('filterModal').style.display = 'none';
 }
 
+// Удаление файла
 async function deleteFile(id, filename) {
     const response = await fetch(`/delete/${id}`, {
         method: 'DELETE'
@@ -203,6 +250,7 @@ async function deleteFile(id, filename) {
 let oldIdToReplace = '';
 let newFileToReplace = null;
 
+// Удаление файла
 function openReplaceModal(id, oldFilename) {
     oldIdToReplace = id;
     const fileInput = document.createElement('input');
@@ -215,6 +263,7 @@ function openReplaceModal(id, oldFilename) {
     fileInput.click();
 }
 
+// Удаление файла
 document.getElementById('confirm-replace').addEventListener('click', async function() {
     if (newFileToReplace) {
         const formData = new FormData();
@@ -249,10 +298,12 @@ document.getElementById('confirm-replace').addEventListener('click', async funct
     }
 });
 
+// Удаление файла
 document.getElementById('cancel-replace').addEventListener('click', function() {
     document.getElementById('modal').style.display = 'none';
 });
 
+// Закрытие модального окна замены файла
 function closeReplaceModal() {
     document.getElementById('modal').style.display = 'none';
 }
@@ -276,6 +327,7 @@ async function showMetadata(id) {
     }
 }
 
+// Форматирование метаданных для отображения
 function formatMetadata(metadata) {
     return Object.entries(metadata).map(([key, value]) => {
         if (Array.isArray(value)) {
@@ -285,6 +337,7 @@ function formatMetadata(metadata) {
     }).join('\n');
 }
 
+// Закрытие модального окна метаданных
 function closeMetadataModal() {
     document.getElementById('metadataModal').style.display = 'none';
 }
@@ -328,6 +381,36 @@ window.addEventListener('click', function(event) {
     });
 });
 
+// Функция для переключения вида в зависимости от ширины окна
+function handleResize() {
+    const fileList = document.getElementById('fileList');
+    const viewToggle = document.getElementById('viewToggle');
+    const windowWidth = window.innerWidth;
+
+    if (windowWidth <= 1020) {
+        if (fileList.classList.contains('list-view')) {
+            fileList.classList.remove('list-view');
+            fileList.classList.add('grid-view');
+        }
+        viewToggle.disabled = true; // Деактивация кнопки переключения вида
+        viewToggle.checked = true; // Установка состояния кнопки в grid-view
+        viewToggle.classList.add('disabled'); // Добавление класса для понижения прозрачности
+    } else {
+        viewToggle.disabled = false; // Активация кнопки переключения вида
+        viewToggle.classList.remove('disabled'); // Удаление класса для понижения прозрачности
+    }
+}
+
+// Добавление обработчика события resize
+window.addEventListener('resize', handleResize);
+
+// Вызов функции при загрузке страницы для установки начального состояния
+window.onload = function() {
+    document.getElementById('viewToggle').checked = false;
+    loadFiles();
+    handleResize(); // Установка начального состояния в зависимости от ширины окна
+};
+
 // Переключение между построчным видом и сеткой
 document.getElementById('viewToggle').addEventListener('change', function(event) {
     const fileList = document.getElementById('fileList');
@@ -340,6 +423,7 @@ document.getElementById('viewToggle').addEventListener('change', function(event)
     }
 });
 
+// Показ баннера успешной замены файла
 function showSuccessBanner() {
     const banner = document.getElementById('successBanner');
     banner.style.display = 'block';
@@ -352,15 +436,18 @@ function showSuccessBanner() {
     }, 2000); // Время показа баннера перед началом затухания
 }
 
+// Открытие модального окна истории изменений
 document.getElementById('viewHistoryButton').addEventListener('click', function() {
     loadHistory();
 });
 
+// Загрузка истории изменений с фильтрацией
 document.getElementById('historyFilterSelect').addEventListener('change', function() {
     const filter = this.value;
     loadHistory(filter);
 });
 
+// Загрузка истории изменений
 async function loadHistory(filter = 'last10') {
     const response = await fetch(`/history?filter=${filter}`);
     if (response.ok) {
@@ -393,6 +480,7 @@ async function loadHistory(filter = 'last10') {
     }
 }
 
+// Очистка истории изменений
 document.getElementById('clearHistoryButton').addEventListener('click', async function() {
     const response = await fetch('/clear-history', {
         method: 'POST'
@@ -406,17 +494,73 @@ document.getElementById('clearHistoryButton').addEventListener('click', async fu
     }
 });
 
+// Закрытие модального окна истории изменений
 function closeHistoryModal() {
     document.getElementById('historyModal').style.display = 'none';
 }
 
+// Открытие модального окна комментариев
+function openCommentModal(fileId) {
+    const commentForm = document.getElementById('commentForm');
+    commentForm.dataset.fileId = fileId;
+    loadComments(fileId);
+    document.getElementById('commentModal').style.display = 'block';
+}
 
 
+// Закрытие модального окна комментариев
+function closeCommentModal() {
+    document.getElementById('commentModal').style.display = 'none';
+}
 
+// Загрузка комментариев для файла
+async function loadComments(fileId) {
+    const response = await fetch(`/comments/${fileId}`);
+    if (response.ok) {
+        const comments = await response.json();
+        const commentsList = document.getElementById('commentsList');
+        commentsList.innerHTML = '';
+        comments.forEach(comment => {
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            commentElement.innerHTML = `
+                <p><strong>${comment.author}</strong> (${comment.commentDate}):</p>
+                <p>${comment.comment}</p>
+            `;
+            commentsList.appendChild(commentElement);
+        });
+    } else {
+        alert('Ошибка при загрузке комментариев');
+    }
+}
 
+// Добавление нового комментария
+document.getElementById('commentForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const fileId = event.target.dataset.fileId;
+    const author = document.getElementById('commentAuthor').value;
+    const comment = document.getElementById('commentText').value;
+
+    const response = await fetch('/add-comment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fileId, author, comment })
+    });
+
+    if (response.ok) {
+        loadComments(fileId);
+        document.getElementById('commentAuthor').value = '';
+        document.getElementById('commentText').value = '';
+    } else {
+        alert('Ошибка при добавлении комментария');
+    }
+});
 
 // Установка дефолтного значения флажка "сетка" на неактивное при перезагрузке страницы
 window.onload = function() {
     document.getElementById('viewToggle').checked = false;
     loadFiles();
 };
+
