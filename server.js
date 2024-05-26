@@ -36,6 +36,29 @@ db.exec(`
     );
 `);
 
+// Создание таблицы для истории изменений
+db.exec(`
+    CREATE TABLE IF NOT EXISTS history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fileId INTEGER,
+        filename TEXT,
+        author TEXT,
+        changeDate DATETIME,
+        changeText TEXT,
+        FOREIGN KEY (fileId) REFERENCES files(id)
+    );
+`);
+
+// Маршрут для получения последних 10 записей истории изменений
+app.get('/history', (req, res) => {
+    const stmt = db.prepare(`
+        SELECT * FROM history ORDER BY changeDate DESC LIMIT 10
+    `);
+    const history = stmt.all();
+    res.json(history);
+});
+
+
 // Настройка хранилища для multer
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -54,30 +77,6 @@ app.use(express.static('public'));
 const sanitizeFilename = (filename) => {
     return filename.replace(/[^a-zA-Z0-9.\-_]/g, '_');
 };
-
-// Маршрут для загрузки файлов
-app.post('/upload', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('Файл не загружен');
-    }
-
-    const stmt = db.prepare(`
-        INSERT INTO files (author, filename, uploadDate, modifyDate, extension, size, state, relatedFiles, data)
-        VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?)
-    `);
-
-    const info = stmt.run(
-        req.body.username || 'guest',
-        req.file.originalname,
-        path.extname(req.file.originalname),
-        req.file.size / 1024, // Размер файла в килобайтах
-        'Current',
-        JSON.stringify([]),
-        req.file.buffer
-    );
-
-    res.json({ id: info.lastInsertRowid, filename: req.file.originalname, size: req.file.size / 1024 });
-});
 
 // Маршрут для получения списка файлов
 app.get('/files', (req, res) => {
@@ -111,6 +110,36 @@ app.get('/files', (req, res) => {
     const files = stmt.all(...params);
     res.json(files);
 });
+// Маршрут для загрузки файлов
+app.post('/upload', upload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('Файл не загружен');
+    }
+
+    const stmt = db.prepare(`
+        INSERT INTO files (author, filename, uploadDate, modifyDate, extension, size, state, relatedFiles, data)
+        VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?, ?)
+    `);
+
+    const info = stmt.run(
+        req.body.username || 'guest',
+        req.file.originalname,
+        path.extname(req.file.originalname),
+        req.file.size / 1024, // Размер файла в килобайтах
+        'Current',
+        JSON.stringify([]),
+        req.file.buffer
+    );
+
+    // Запись в историю
+    const historyStmt = db.prepare(`
+        INSERT INTO history (fileId, filename, author, changeDate, changeText)
+        VALUES (?, ?, ?, datetime('now'), ?)
+    `);
+    historyStmt.run(info.lastInsertRowid, req.file.originalname, req.body.username || 'guest', 'Файл загружен');
+
+    res.json({ id: info.lastInsertRowid, filename: req.file.originalname, size: req.file.size / 1024 });
+});
 
 // Маршрут для удаления файлов (перемещение в корзину)
 app.delete('/delete/:id', (req, res) => {
@@ -134,6 +163,13 @@ app.delete('/delete/:id', (req, res) => {
         UPDATE files SET state = 'Deleted', modifyDate = datetime('now') WHERE id = ?
     `);
     updateStmt.run(id);
+
+    // Запись в историю
+    const historyStmt = db.prepare(`
+        INSERT INTO history (fileId, filename, author, changeDate, changeText)
+        VALUES (?, ?, ?, datetime('now'), ?)
+    `);
+    historyStmt.run(id, fileMeta.filename, fileMeta.author, 'Файл удалён');
 
     res.sendStatus(200);
 });
@@ -187,8 +223,17 @@ app.post('/replace', upload.single('file'), (req, res) => {
     `);
     updateRelatedFilesStmt.run(JSON.stringify(relatedFiles), oldId);
 
+    // Запись в историю
+    const historyStmt = db.prepare(`
+        INSERT INTO history (fileId, filename, author, changeDate, changeText)
+        VALUES (?, ?, ?, datetime('now'), ?)
+    `);
+    historyStmt.run(oldId, oldFileMeta.filename, oldFileMeta.author, 'Файл заменён');
+
     res.json({ id: newId, filename: req.file.originalname, oldFilename: oldFileMeta.filename });
 });
+
+
 
 // Маршрут для скачивания файла
 app.get('/download/:id', (req, res) => {
@@ -242,14 +287,21 @@ app.post('/empty-trash', (req, res) => {
     res.sendStatus(200);
 });
 
-// Маршрут для получения метаданных
-app.get('/metadata', (req, res) => {
+// Маршрут для получения метаданных конкретного файла
+app.get('/metadata/:id', (req, res) => {
+    const id = parseInt(req.params.id);
     const stmt = db.prepare(`
-        SELECT * FROM files
+        SELECT * FROM files WHERE id = ?
     `);
-    const metaData = stmt.all();
-    res.json(metaData);
+    const fileMetadata = stmt.get(id);
+
+    if (!fileMetadata) {
+        return res.status(404).send('Файл не найден');
+    }
+
+    res.json(fileMetadata);
 });
+
 
 // Запуск сервера
 app.listen(PORT, () => {

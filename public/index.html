@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Загрузка файлов</title>
-    <link rel="stylesheet" href="style.css">
+    <title>АРХИВ</title>
+    <link rel="stylesheet" href="style-brutal.css">
     <link rel="shortcut icon" href="media/favicon.ico" type="image/x-icon">
     <link rel="icon" href="media/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <header>
-        <h1>Загрузка файлов</h1>
+        <h1>АРХИВ</h1>
         <button id="emptyTrashButton">Очистить корзину</button>
-        <button id="checkFilesButton">Проверить файлы</button>
+        <button id="viewHistoryButton">Просмотреть историю</button>
         <button id="filterButton">Фильтровать</button>
         <label class="switch">
             <input type="checkbox" id="viewToggle">
@@ -24,9 +24,6 @@
         <label for="username">Имя пользователя:</label>
         <input type="text" id="username" name="username" placeholder="Введите имя пользователя">
         <br>
-        <label for="fileInput">Выберите файл:</label>
-        <input type="file" id="fileInput" name="file" required>
-        <br>
         <div id="dropZone" class="drop-zone">
             Перетащите файлы сюда или нажмите для выбора
         </div>
@@ -34,7 +31,7 @@
     </form>
     
     <div id="fileCount">Количество файлов: 0</div>
-    <div id="fileList" class="list-view"></div>
+    <div id="fileList" class="list-view"></div> <!-- Добавлен класс list-view -->
 
     <!-- Модальное окно для фильтрации -->
     <div id="filterModal" class="modal">
@@ -46,21 +43,21 @@
             <label for="authorInput">Автор:</label>
             <input type="text" id="authorInput" placeholder="Введите имя автора">
             <label for="searchType">Тип поиска:</label>
-            <select id="searchType" class="custom-select">
+            <select id="searchType" class="custom-select"> <!-- Добавлен класс custom-select -->
                 <option value="exact">Строго по строке</option>
                 <option value="substring">Мягко по подстроке</option>
             </select>
             <label for="filterParamSelect">Сортировать по:</label>
-            <select id="filterParamSelect" class="custom-select">
+            <select id="filterParamSelect" class="custom-select"> <!-- Добавлен класс custom-select -->
                 <option value="id">ID</option>
                 <option value="size">Размер</option>
             </select>
             <label for="orderSelect">Порядок сортировки:</label>
-            <select id="orderSelect" class="custom-select">
+            <select id="orderSelect" class="custom-select"> <!-- Добавлен класс custom-select -->
                 <option value="asc">По возрастанию</option>
                 <option value="desc">По убыванию</option>
             </select>
-            <div id = "divFilterButtons">
+            <div id="divFilterButtons">
                 <button id="applyFilterButton">Применить</button>
                 <button id="resetFilterButton">Сбросить фильтры</button>
             </div>            
@@ -87,6 +84,16 @@
         </div>
     </div>
 
+    <!-- Модальное окно для истории изменений -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content left-align">
+            <span class="close" onclick="closeHistoryModal()">&times;</span>
+            <h2>История изменений</h2>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
+
     <!-- Модальное окно для метаданных -->
     <div id="metadataModal" class="modal">
         <div class="modal-content left-align">
@@ -97,5 +104,8 @@
     </div>
 
     <script src="script.js"></script>
+
+    <div id="successBanner">Файл успешно заменён!</div>
+
 </body>
 </html>

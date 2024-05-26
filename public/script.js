@@ -1,29 +1,74 @@
-document.getElementById('uploadForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const formData = new FormData();
-    const fileInput = document.getElementById('fileInput');
-    const usernameInput = document.getElementById('username');
-    const username = usernameInput.value.trim() || 'guest'; // Установка имени пользователя как "guest", если поле пустое
-    formData.append('file', fileInput.files[0]);
-    formData.append('username', username);
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.style.display = 'none';
+    fileInput.name = 'file';
+    fileInput.required = true;
+    document.getElementById('uploadForm').appendChild(fileInput);
 
-    const response = await fetch('/upload', {
-        method: 'POST',
-        body: formData
+    dropZone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropZone.classList.add('dragover');
     });
 
-    if (response.ok) {
-        const result = await response.json();
-        displayFile(result.id, result.filename, result.size);
-        // Обновление счётчика файлов
-        const currentCount = parseInt(document.getElementById('fileCount').textContent.split(': ')[1]);
-        updateFileCount(currentCount + 1);
-        // Сброс поля выбора файла и имени пользователя
-        fileInput.value = '';
-        usernameInput.value = '';
-    } else {
-        alert('Ошибка при загрузке файла');
-    }
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            dropZone.textContent = files[0].name;
+        }
+    });
+
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            dropZone.textContent = fileInput.files[0].name;
+        } else {
+            dropZone.textContent = 'Перетащите файлы сюда или нажмите для выбора';
+        }
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData();
+        const usernameInput = document.getElementById('username');
+        const username = usernameInput.value.trim() || 'guest'; // Установка имени пользователя как "guest", если поле пустое
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+            formData.append('username', username);
+
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                displayFile(result.id, result.filename, result.size);
+                // Обновление счётчика файлов
+                const currentCount = parseInt(document.getElementById('fileCount').textContent.split(': ')[1]);
+                updateFileCount(currentCount + 1);
+                // Сброс поля выбора файла и имени пользователя
+                fileInput.value = '';
+                usernameInput.value = '';
+                dropZone.textContent = 'Перетащите файлы сюда или нажмите для выбора';
+            } else {
+                alert('Ошибка при загрузке файла');
+            }
+        } else {
+            alert('Пожалуйста, выберите файл для загрузки');
+        }
+    });
 });
 
 async function loadFiles(order = 'asc', filterParam = 'id', author = '', filename = '', searchType = 'substring') {
@@ -70,6 +115,34 @@ function updateFileCount(count) {
     fileCountElement.textContent = `Количество файлов: ${count}`;
 }
 
+// document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+//     event.preventDefault();
+//     const formData = new FormData();
+//     const usernameInput = document.getElementById('username');
+//     const username = usernameInput.value.trim() || 'guest'; // Установка имени пользователя как "guest", если поле пустое
+//     formData.append('file', fileInput.files[0]);
+//     formData.append('username', username);
+
+//     const response = await fetch('/upload', {
+//         method: 'POST',
+//         body: formData
+//     });
+
+//     if (response.ok) {
+//         const result = await response.json();
+//         displayFile(result.id, result.filename, result.size);
+//         // Обновление счётчика файлов
+//         const currentCount = parseInt(document.getElementById('fileCount').textContent.split(': ')[1]);
+//         updateFileCount(currentCount + 1);
+//         // Сброс поля выбора файла и имени пользователя
+//         fileInput.value = '';
+//         usernameInput.value = '';
+//         dropZone.textContent = 'Перетащите файлы сюда или нажмите для выбора';
+//     } else {
+//         alert('Ошибка при загрузке файла');
+//     }
+// });
+
 document.getElementById('filterButton').addEventListener('click', function() {
     document.getElementById('filterModal').style.display = 'block';
 });
@@ -108,14 +181,17 @@ async function deleteFile(id, filename) {
     const response = await fetch(`/delete/${id}`, {
         method: 'DELETE'
     });
-
+    const currentCount = parseInt(document.getElementById('fileCount').textContent.split(': ')[1]);
+    updateFileCount(currentCount - 1);
     if (response.ok) {
         // Удаление карточки файла из DOM
         const fileList = document.getElementById('fileList');
         const fileCards = fileList.getElementsByClassName('file-card');
+        
         for (let i = 0; i < fileCards.length; i++) {
             if (fileCards[i].querySelector('p').textContent === filename) {
                 fileList.removeChild(fileCards[i]);
+                
                 break;
             }
         }
@@ -158,8 +234,7 @@ document.getElementById('confirm-replace').addEventListener('click', async funct
             for (let i = 0; i < fileCards.length; i++) {
                 if (fileCards[i].querySelector('p').textContent === result.oldFilename) {
                     fileCards[i].querySelector('p').textContent = result.filename;
-                    fileCards[i].querySelector('.download-button').href = `/storage/${result.filename}`;
-                    fileCards[i].querySelector('.download-button').textContent = 'Скачать';
+                    fileCards[i].querySelector('.download-button').setAttribute('onclick', `downloadFile(${result.id})`);
                     fileCards[i].querySelector('.replace-button').setAttribute('onclick', `openReplaceModal('${result.id}', '${result.filename}')`);
                     fileCards[i].querySelector('.delete-button').setAttribute('onclick', `deleteFile('${result.id}', '${result.filename}')`);
                     fileCards[i].querySelector('.metadata-button').setAttribute('onclick', `showMetadata('${result.id}')`);
@@ -167,6 +242,7 @@ document.getElementById('confirm-replace').addEventListener('click', async funct
                 }
             }
             document.getElementById('modal').style.display = 'none';
+            showSuccessBanner(); // Показ баннера после успешной замены файла
         } else {
             alert('Ошибка при замене файла');
         }
@@ -189,17 +265,12 @@ document.querySelectorAll('.close').forEach(closeButton => {
 
 // Функция для отображения метаданных
 async function showMetadata(id) {
-    const response = await fetch('/metadata');
+    const response = await fetch(`/metadata/${id}`);
     if (response.ok) {
-        const metadata = await response.json();
-        const fileMetadata = metadata.find(file => file.id === parseInt(id));
-        if (fileMetadata) {
-            const formattedMetadata = formatMetadata(fileMetadata);
-            document.getElementById('metadataContent').textContent = formattedMetadata;
-            document.getElementById('metadataModal').style.display = 'block';
-        } else {
-            alert('Метаданные не найдены');
-        }
+        const fileMetadata = await response.json();
+        const formattedMetadata = formatMetadata(fileMetadata);
+        document.getElementById('metadataContent').textContent = formattedMetadata;
+        document.getElementById('metadataModal').style.display = 'block';
     } else {
         alert('Ошибка при получении метаданных');
     }
@@ -247,20 +318,6 @@ document.getElementById('cancelEmptyTrash').addEventListener('click', function()
     document.getElementById('emptyTrashModal').style.display = 'none';
 });
 
-// Функция для проверки и реанимации файлов
-document.getElementById('checkFilesButton').addEventListener('click', async function() {
-    const response = await fetch('/check-files', {
-        method: 'POST'
-    });
-
-    if (response.ok) {
-        alert('Проверка завершена. Файлы реанимированы.');
-        loadFiles(); // Перезагрузка списка файлов
-    } else {
-        alert('Ошибка при проверке файлов');
-    }
-});
-
 // Закрытие модальных окон при нажатии на область вне модального окна
 window.addEventListener('click', function(event) {
     const modals = document.querySelectorAll('.modal');
@@ -282,6 +339,54 @@ document.getElementById('viewToggle').addEventListener('change', function(event)
         fileList.classList.add('list-view');
     }
 });
+
+function showSuccessBanner() {
+    const banner = document.getElementById('successBanner');
+    banner.style.display = 'block';
+    banner.style.opacity = '1';
+    setTimeout(() => {
+        banner.style.opacity = '0';
+        setTimeout(() => {
+            banner.style.display = 'none';
+        }, 1000); // Время затухания должно совпадать с transition в CSS
+    }, 2000); // Время показа баннера перед началом затухания
+}
+
+document.getElementById('viewHistoryButton').addEventListener('click', function() {
+    loadHistory();
+});
+
+async function loadHistory() {
+    const response = await fetch('/history');
+    if (response.ok) {
+        const history = await response.json();
+        const historyContent = document.getElementById('historyContent');
+        historyContent.innerHTML = ''; // Очистка содержимого перед загрузкой
+
+        history.forEach(entry => {
+            const entryElement = document.createElement('div');
+            entryElement.className = 'history-entry';
+            entryElement.innerHTML = `
+                <p class="history-author">Автор: ${entry.author}</p>
+                <p class="history-date">Дата: ${entry.changeDate}</p>
+                <p class="history-filename">Файл: ${entry.filename}</p>
+                <p class="history-text">Изменение: ${entry.changeText}</p>
+            `;
+            historyContent.appendChild(entryElement);
+        });
+
+        document.getElementById('historyModal').style.display = 'block';
+    } else {
+        alert('Ошибка при загрузке истории изменений');
+    }
+}
+
+function closeHistoryModal() {
+    document.getElementById('historyModal').style.display = 'none';
+}
+
+
+
 
 // Установка дефолтного значения флажка "сетка" на неактивное при перезагрузке страницы
 window.onload = function() {
