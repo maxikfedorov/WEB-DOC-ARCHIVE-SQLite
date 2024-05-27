@@ -331,3 +331,222 @@ input:checked + .slider:before {
 .select-hide {
     display: none;
 }
+
+/* Стили для баннера успеха */
+#successBanner {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 1000;
+    font-size: 16px;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+}
+
+/* Стили для истории */
+.history-entry {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.history-entry:last-child {
+    border-bottom: none;
+}
+
+.history-author {
+    font-weight: bold;
+}
+
+.history-date {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.history-text {
+    margin-top: 5px;
+}
+
+#historyFilter {
+    margin-bottom: 20px;
+}
+
+#historyFilterSelect {
+    padding: 10px;
+    border: 1px solid #000;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.history-grid-view {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.history-grid-view .history-entry {
+    width: calc(25% - 10px);
+    border: 1px solid #000;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+}
+
+/* Стили для выпадающего меню статуса */
+.status-select {
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #000;
+    background-color: #fff;
+    color: #000;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.status-select:hover {
+    background-color: #f5f5f5;
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.status-select option {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Стили для кнопки комментариев */
+.comment-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.comment-button:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для модального окна комментариев */
+#commentModal .modal-content {
+    text-align: left;
+    max-width: 500px; /* Ограничение максимальной ширины модального окна */
+    margin: auto; /* Центрирование модального окна */
+}
+
+#commentModal label {
+    display: block;
+    margin-top: 10px;
+}
+
+#commentModal input[type="text"],
+#commentModal textarea {
+    display: block;
+    margin-top: 5px;
+    padding: 8px;
+    border: 1px solid #000;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%; /* Ограничение максимальной ширины текстового поля */
+    max-height: 200px; /* Ограничение максимальной высоты текстового поля */
+    resize: vertical; /* Разрешить изменение размера только по вертикали */
+}
+
+#commentModal button[type="submit"] {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#commentModal button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для комментариев */
+.comment {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.comment:last-child {
+    border-bottom: none;
+}
+
+
+
+
+
+
+
+
+
+/* Стили для переключателя темы */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #007bff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Стили для круглого ползунка */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+

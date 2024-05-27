@@ -4,20 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>АРХИВ</title>
-    <link rel="stylesheet" href="style-brutal.css">
+    <!-- <link rel="stylesheet" href="styles/style.css"> -->
+    
+    <link rel="stylesheet" href="styles/style-brutal.css" id="theme-link">
     <link rel="shortcut icon" href="media/favicon.ico" type="image/x-icon">
     <link rel="icon" href="media/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <header>
         <h1>АРХИВ</h1>
-        <button id="emptyTrashButton">Очистить корзину</button>
-        <button id="viewHistoryButton">Просмотреть историю</button>
-        <button id="filterButton">Фильтровать</button>
-        <label class="switch">
-            <input type="checkbox" id="viewToggle">
-            <span class="slider round"></span>
-        </label>
+        <div class="button-container">
+            <button id="emptyTrashButton">Очистить корзину</button>
+            <button id="viewHistoryButton">Просмотреть историю</button>
+            <button id="filterButton">Фильтровать</button>
+            <button id="themeToggleButton">Переключить тему</button>
+            <label class="switch">
+                <input type="checkbox" id="viewToggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
     </header>
 
     <form id="uploadForm" enctype="multipart/form-data">

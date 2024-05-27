@@ -1,41 +1,77 @@
-/* Подключение шрифта */
 @font-face {
     font-family: 'Code New Roman';
-    src: url('../fonts/Code New Roman.otf') format('truetype');
+    src: url('../fonts/Code New Roman.otf') format('truetype'); /* Укажите правильный путь к файлу шрифта */
 }
 
-/* Основные стили для body */
 body {
-    font-family: 'Courier New', monospace;
+    font-family: 'Code New Roman', sans-serif;
     margin: 40px;
-    background-color: #fff;
-    color: #000;
 }
 
 /* Стили для header */
 header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: end;
     margin-bottom: 20px;
-    border-bottom: 2px solid #000;
+    border-bottom: 2px solid #ccc;
     padding-bottom: 10px;
+    flex-wrap: wrap; /* Добавлено для адаптивности */
 }
 
-/* Стили для заголовков */
+header h1 {
+    flex: 0 0 auto; /* Заголовок занимает только необходимое пространство */
+    margin: 0; /* Убираем отступы */
+    margin-bottom: 5px;
+}
+
+header .button-container {
+    display: flex;
+    flex: 1; /* Контейнер с кнопками занимает оставшееся пространство */
+    justify-content: space-around; /* Выравнивание по центру */
+    align-items: center; /* Выравнивание по центру */
+    gap: 10px; /* Промежуток между кнопками */
+}
+
+/* Медиазапросы для адаптивности header */
+@media (max-width: 890px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    header h1 {
+        margin-bottom: 10px;
+    }
+
+    header .button-container {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    header .button-container button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    header .switch {
+        align-self: center;
+    }
+}
+
+
 h1 {
-    color: #000;
+    color: #333;
     font-size: 24px;
 }
 
-/* Стили для форм */
 form {
     margin-bottom: 20px;
 }
 
-/* Стили для карточек файлов */
 .file-card {
-    border: 1px solid #000;
+    border: 1px solid #ccc;
     padding: 10px;
     margin-top: 10px;
     display: flex;
@@ -55,7 +91,7 @@ form {
 }
 
 .file-name {
-    word-break: break-all;
+    word-break: break-all; /* Перенос длинных имен файлов */
 }
 
 .file-actions {
@@ -65,25 +101,32 @@ form {
     align-items: center;
 }
 
-/* Стили для кнопок загрузки */
 .download-button {
     display: inline-block;
     margin-top: 10px;
     padding: 10px 20px;
     color: #fff;
-    background-color: #000;
+    background-color: #006636;
     border: none;
+    border-radius: 4px;
     text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
     cursor: pointer;
 }
 
 .download-button:hover {
-    background-color: #333;
+    background-color: #00b351;
+    transform: translateY(-2px);
 }
 
-/* Стили для зоны перетаскивания файлов */
+.download-button:active {
+    background-color: #009459;
+    transform: translateY(0);
+}
+
 .drop-zone {
-    border: 2px dashed #000;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
     padding: 20px;
     text-align: center;
     cursor: pointer;
@@ -92,11 +135,10 @@ form {
 }
 
 .drop-zone.dragover {
-    background-color: #e0e0e0;
-    border-color: #000;
+    border-color: #007bff;
+    background-color: #f1f1f1;
 }
 
-/* Стили для меток и полей ввода */
 label {
     display: block;
     margin-top: 10px;
@@ -107,58 +149,60 @@ input[type="file"] {
     display: block;
     margin-top: 5px;
     padding: 8px;
-    border: 1px solid #000;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* Стили для кнопок */
 button {
     margin-top: 10px;
     padding: 10px 20px;
-    background-color: #000;
+    background-color: #007bff;
     color: white;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #333;
+    background-color: #0056b3;
 }
 
 .replace-button {
-    background-color: #ffcc00;
+    background-color: #ffc107;
 }
 
 .replace-button:hover {
-    background-color: #e6b800;
+    background-color: #e0a800;
 }
 
 .delete-button {
-    background-color: #ff0000;
+    background-color: #dc3545;
 }
 
 .delete-button:hover {
-    background-color: #cc0000;
+    background-color: #c82333;
 }
 
 #emptyTrashButton {
-    background-color: #ff0000;
+    background-color: #ff5722;
 }
 
 #emptyTrashButton:hover {
-    background-color: #cc0000;
+    background-color: #e64a19;
 }
 
 #resetFilterButton {
-    background-color: #ff0000;
+    background-color: #dc3545;
 }
 
 #resetFilterButton:hover {
-    background-color: #cc0000;
+    background-color: #c82333;
 }
 
-/* Стили для модальных окон */
+/* Стили для модального окна */
 .modal {
     display: none;
     position: fixed;
@@ -168,26 +212,26 @@ button:hover {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0,0,0,0.4);
     padding-top: 60px;
 }
 
 .modal-content {
-    background-color: #fff;
+    background-color: #fefefe;
     margin: 5% auto;
     padding: 20px;
-    border: 1px solid #000;
+    border: 1px solid #888;
     width: 80%;
     max-width: 500px;
     text-align: center;
 }
 
 .modal-content.left-align {
-    text-align: left;
+    text-align: left; /* Выравнивание по левому краю */
 }
 
 .close {
-    color: #000;
+    color: #aaa;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -195,11 +239,12 @@ button:hover {
 
 .close:hover,
 .close:focus {
-    color: #333;
+    color: black;
+    text-decoration: none;
     cursor: pointer;
 }
 
-/* Стили для сеточного вида */
+/* Стили для сетки */
 .grid-view {
     display: flex;
     flex-wrap: wrap;
@@ -220,8 +265,8 @@ button:hover {
 
 .grid-view .file-actions {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
+    grid-template-columns: repeat(2, 1fr); /* Два столбца одинаковой ширины */
+    gap: 5px; /* Промежуток между элементами */
 }
 
 /* Адаптивные стили для количества карточек в строке */
@@ -249,7 +294,7 @@ button:hover {
     }
 }
 
-/* Стили для переключателей */
+/* Стили для флажка */
 .switch {
     position: relative;
     display: inline-block;
@@ -270,8 +315,9 @@ button:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #000;
+    background-color: #ccc;
     transition: .4s;
+    border-radius: 34px;
 }
 
 .slider:before {
@@ -283,10 +329,11 @@ button:hover {
     bottom: 4px;
     background-color: white;
     transition: .4s;
+    border-radius: 50%;
 }
 
 input:checked + .slider {
-    background-color: #333;
+    background-color: #007bff;
 }
 
 input:checked + .slider:before {
@@ -299,8 +346,7 @@ input:checked + .slider:before {
     cursor: not-allowed; /* Изменение курсора */
 }
 
-
-/* Стили для кастомного селекта */
+/* Стили для кастомных select */
 .custom-select {
     position: relative;
     display: inline-block;
@@ -309,14 +355,16 @@ input:checked + .slider:before {
 }
 
 .custom-select select {
-    display: none;
+    display: none; /* Скрываем стандартный select */
 }
 
 .select-selected {
-    background-color: #fff;
-    border: 1px solid #000;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     padding: 10px;
     cursor: pointer;
+    user-select: none;
 }
 
 .select-selected:after {
@@ -324,10 +372,11 @@ input:checked + .slider:before {
     position: absolute;
     top: 14px;
     right: 10px;
-    border: solid #000;
+    border: solid #888;
     border-width: 0 3px 3px 0;
     padding: 3px;
     transform: rotate(45deg);
+    transition: .4s;
 }
 
 .select-selected.select-arrow-active:after {
@@ -336,8 +385,9 @@ input:checked + .slider:before {
 
 .select-items {
     position: absolute;
-    background-color: #fff;
-    border: 1px solid #000;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     z-index: 99;
     width: 100%;
     max-height: 200px;
@@ -348,10 +398,11 @@ input:checked + .slider:before {
 .select-items div {
     padding: 10px;
     cursor: pointer;
+    user-select: none;
 }
 
 .select-items div:hover {
-    background-color: #f5f5f5;
+    background-color: #ddd;
 }
 
 .select-hide {
@@ -511,4 +562,59 @@ input:checked + .slider:before {
 
 .comment:last-child {
     border-bottom: none;
+}
+
+/* Стили для переключателя темы */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #007bff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Стили для круглого ползунка */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
 }

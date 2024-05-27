@@ -72,6 +72,33 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggleButton = document.getElementById('themeToggleButton');
+    const themeLink = document.getElementById('theme-link');
+
+    // Установка начального состояния темы
+    if (localStorage.getItem('theme') === 'brutal') {
+        themeLink.href = 'styles/style-brutal.css';
+    } else {
+        themeLink.href = 'styles/style.css';
+    }
+
+    // Обработчик переключения темы
+    themeToggleButton.addEventListener('click', function() {
+        if (themeLink.href.includes('style.css')) {
+            themeLink.href = 'styles/style-brutal.css';
+            localStorage.setItem('theme', 'brutal');
+        } else {
+            themeLink.href = 'styles/style.css';
+            localStorage.setItem('theme', 'default');
+        }
+    });
+});
+
+
+
+
+
 // Обновление статуса файла
 async function updateStatus(id, newStatus) {
     const response = await fetch(`/update-status/${id}`, {
@@ -507,7 +534,6 @@ function openCommentModal(fileId) {
     document.getElementById('commentModal').style.display = 'block';
 }
 
-
 // Закрытие модального окна комментариев
 function closeCommentModal() {
     document.getElementById('commentModal').style.display = 'none';
@@ -557,6 +583,7 @@ document.getElementById('commentForm').addEventListener('submit', async function
         alert('Ошибка при добавлении комментария');
     }
 });
+
 
 // Установка дефолтного значения флажка "сетка" на неактивное при перезагрузке страницы
 window.onload = function() {

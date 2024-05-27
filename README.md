@@ -79,9 +79,6 @@
 │   ├── style-brutal.css
 │   ├── style.css
 │   ├── fonts
-│   │   ├── Code New Roman b.otf
-│   │   ├── Code New Roman i.otf
-│   │   └── Code New Roman.otf
 │   └── media
 │       └── favicon.ico
 
